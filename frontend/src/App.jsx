@@ -4,34 +4,38 @@ import SignUpForm from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./routes/ProtectedRoutes";
-
+import Welcome from "./pages/Welcome";
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/signup" element={<SignUpForm />} />
+      {/* ✅ Move this outside <Routes> */}
+      <div>
+        <Routes>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignUpForm />} />
 
-        {/* Protect the user route */}
-        <Route
-          path="/userdashboard"
-          element={
-            <ProtectedRoute requiredRole="user">
-              <UserDashboard />
-            </ProtectedRoute>
-          }
-        />
+          {/* Protected user route */}
+          {/* <Route path="/" element={<Welcome />} /> */}
+          <Route
+            path="/userdashboard/*"
+            element={
+              <ProtectedRoute requiredRole="user">
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Protect the admin route */}
-        <Route
-          path="/admindashboard"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          {/* Protected admin route */}
+          <Route
+            path="/admindashboard"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }

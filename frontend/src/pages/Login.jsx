@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../axios";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -15,12 +15,15 @@ const LoginForm = () => {
     e.preventDefault();
     setError("");
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        form
-      );
+      const res = await axios.post("/auth/login", form);
       const token = res.data.token;
+      
+      // Store token and user info
       localStorage.setItem("token", token);
+
+      // Store user info in localStorage for header display
+      const userInfo = res.data.user;
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
       // Decode token to get role
       const payload = JSON.parse(atob(token.split(".")[1]));
@@ -33,7 +36,8 @@ const LoginForm = () => {
         navigate("/userdashboard");
       }
     } catch (e) {
-      setError(e.response?.data?.message || "Login failed. Please try again.");
+      console.error("Login error:", e.response?.data || e);
+      setError(e.response?.data?.msg || "Login failed. Please try again.");
     }
   };
 
@@ -61,6 +65,7 @@ const LoginForm = () => {
               type="email"
               id="email"
               name="email"
+              value={form.email}
               onChange={handleChange}
               placeholder="Enter your email"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
@@ -79,6 +84,7 @@ const LoginForm = () => {
               type="password"
               id="password"
               name="password"
+              value={form.password}
               onChange={handleChange}
               placeholder="Enter your password"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"

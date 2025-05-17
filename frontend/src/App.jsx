@@ -4,6 +4,15 @@ import SignUpForm from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./routes/ProtectedRoutes";
+// Admin module pages
+import WelcomeAdmin from "./pages/admin/WelcomeAdmin";
+import UserManagement from "./pages/admin/UserManagement";
+import DashboardOverview from "./pages/admin/DashboardOverview";
+import ExcelFileManagement from "./pages/admin/ExcelFileManagement";
+import SettingsConfig from "./pages/admin/SettingsConfig";
+import ActivityLogs from "./pages/admin/ActivityLogs";
+import ChartAnalytics from "./pages/admin/ChartAnalytics";
+import AISummaryMonitor from "./pages/admin/AISummaryMonitor";
 
 function App() {
   return (
@@ -16,21 +25,30 @@ function App() {
         <Route
           path="/userdashboard"
           element={
-            <ProtectedRoute requiredRole="user">
+            <ProtectedRoute role="user">
               <UserDashboard />
             </ProtectedRoute>
           }
         />
 
-        {/* Protect the admin route */}
+        {/* Protect the admin route with nested routes */}
         <Route
-          path="/admindashboard"
+          path="/admindashboard/*"
           element={
-            <ProtectedRoute requiredRole="admin">
+            <ProtectedRoute role="admin">
               <AdminDashboard />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<WelcomeAdmin />} />
+          <Route path="dashboard" element={<DashboardOverview />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="files" element={<ExcelFileManagement />} />
+          <Route path="charts" element={<ChartAnalytics />} />
+          <Route path="ai-summary" element={<AISummaryMonitor />} />
+          <Route path="logs" element={<ActivityLogs />} />
+          <Route path="settings" element={<SettingsConfig />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

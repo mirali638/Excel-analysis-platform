@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -22,78 +22,71 @@ const SignUpForm = () => {
     }
   };
 
+  useEffect(() => {
+    setForm({ name: "", email: "", password: "" });
+  }, []);
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-        <form onSubmit={handleSubmit}>
+    <div className="min-h-screen bg-gradient-to-br from-green-200 via-white to-green-100 flex items-center justify-center px-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transition hover:shadow-xl">
+        <div className="flex flex-col items-center mb-6">
+          <img src="/Excel_logo.jpg" alt="Logo" className="w-16 h-16 mb-2" />
+          <h2 className="text-3xl font-bold text-green-600">Create Account</h2>
+          <p className="text-gray-600 text-sm">Join us and start analyzing today</p>
+        </div>
+
+        <form onSubmit={handleSubmit} autoComplete="off">
           <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Name
-            </label>
+            <label className="block text-gray-700 font-semibold mb-1">Full Name</label>
             <input
               type="text"
-              id="name"
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder="Enter your full name"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+              placeholder="Enter your name"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition"
               required
             />
           </div>
+
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Email
-            </label>
+            <label className="block text-gray-700 font-semibold mb-1">Email</label>
             <input
               type="email"
-              id="email"
               name="email"
               value={form.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition"
               required
             />
           </div>
+
           <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Password
-            </label>
+            <label className="block text-gray-700 font-semibold mb-1">Password</label>
             <input
               type="password"
-              id="password"
               name="password"
               value={form.password}
               onChange={handleChange}
               placeholder="Create a password"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition"
               required
             />
           </div>
-          <div className="flex items-center justify-between">
-            <button
-              type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Sign Up
-            </button>
-          </div>
-          <div className="flex items-center justify-center mt-4">
+
+          <button
+            type="submit"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-full shadow-md transition hover:scale-105"
+          >
+            Sign Up
+          </button>
+
+          <div className="text-center mt-4">
             <p className="text-sm">
-              Already have an account?{" "}
-              <Link to="/login" className="text-blue-700 underline ml-1">
-                Login
+              Already have an account?
+              <Link to="/login" className="text-green-600 font-semibold underline ml-1">
+                Log In
               </Link>
             </p>
           </div>

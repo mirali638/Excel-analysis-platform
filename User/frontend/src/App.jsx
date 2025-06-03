@@ -12,12 +12,13 @@ import ExcelFileManagement from "./pages/admin/ExcelFileManagement";
 import SettingsConfig from "./pages/admin/SettingsConfig";
 import ActivityLogs from "./pages/admin/ActivityLogs";
 import ChartAnalytics from "./pages/admin/ChartAnalytics";
-import AISummaryMonitor from "./pages/admin/AISummaryMonitor";
+import Welcome from "./pages/Welcome";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignUpForm />} />
 
@@ -45,7 +46,6 @@ function App() {
           <Route path="users" element={<UserManagement />} />
           <Route path="files" element={<ExcelFileManagement />} />
           <Route path="charts" element={<ChartAnalytics />} />
-          <Route path="ai-summary" element={<AISummaryMonitor />} />
           <Route path="logs" element={<ActivityLogs />} />
           <Route path="settings" element={<SettingsConfig />} />
         </Route>

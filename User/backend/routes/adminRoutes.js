@@ -390,13 +390,21 @@ router.get("/files/:id/download", async (req, res) => {
     if (!file) return res.status(404).json({ message: "File not found" });
 
     // If you have file path:
-    // res.download(file.filePath);
+    res.download(file.filePath, file.originalName, (err) => {
+      if (err) {
+        console.error("Error downloading file:", err);
+        // Check if headers have already been sent
+        if (!res.headersSent) {
+          res.status(500).json({ message: "Error downloading file" });
+        }
+      }
+    });
 
     // Or if file URL:
     // res.redirect(file.fileUrl);
 
     // For now, simulate with JSON:
-    res.json({ message: `Download logic for file ${file.fileName} here` });
+    // res.json({ message: `Download logic for file ${file.fileName} here` });
   } catch (error) {
     res.status(500).json({ message: "Error downloading file" });
   }

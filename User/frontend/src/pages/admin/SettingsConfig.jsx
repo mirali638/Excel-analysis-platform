@@ -12,10 +12,9 @@ const initialSettings = {
 };
 
 const SettingsConfig = () => {
-  const [settings, setSettings] = useState(initialSettings); // State for form settings
-  const [success, setSuccess] = useState(false); // State to show success message on save
+  const [settings, setSettings] = useState(initialSettings);
+  const [success, setSuccess] = useState(false);
 
-  // Handle input changes for both checkboxes and text/number inputs
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setSettings((prev) => ({
@@ -24,153 +23,145 @@ const SettingsConfig = () => {
     }));
   };
 
-  // Handle form submission (currently only sets success message)
   const handleSubmit = (e) => {
     e.preventDefault();
     setSuccess(true);
-    setTimeout(() => setSuccess(false), 2000);  // Hide success message after 2 seconds
+    setTimeout(() => setSuccess(false), 2000);
   };
 
   return (
-    <div className="p-8">
-      <h2 className="text-2xl font-bold mb-4">System Settings</h2>
-      {success && (
-        <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-          Settings updated successfully!
-        </div>
-      )}
-      {/* Settings Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* File Upload Settings */}
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-semibold mb-4">File Upload Settings</h3>
-          {/* Max file size input */}
-          <div className="mb-4">
-            <label className="block mb-2">
-              Maximum File Size (MB)
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-white py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <h2 className="text-3xl font-bold text-green-700 text-center mb-6">
+          ⚙️ System Settings
+        </h2>
+
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow text-center">
+            ✅ Settings updated successfully!
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* File Upload Settings */}
+          <SectionCard title="📁 File Upload Settings">
+            <Field label="Maximum File Size (MB)">
               <input
                 type="number"
                 name="maxFileSize"
                 value={settings.maxFileSize}
                 onChange={handleChange}
-                className="mt-1 block w-full border rounded px-3 py-2"
+                className="input"
                 min="1"
                 max="100"
               />
-            </label>
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">
-              Allowed File Types
+            </Field>
+            <Field label="Allowed File Types">
               <input
                 type="text"
                 name="allowedFileTypes"
                 value={settings.allowedFileTypes}
                 onChange={handleChange}
-                className="mt-1 block w-full border rounded px-3 py-2"
+                className="input"
                 placeholder=".xlsx, .xls"
               />
-            </label>
-          </div>
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="autoProcessFiles"
-                checked={settings.autoProcessFiles}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Auto-process uploaded files
-            </label>
-          </div>
-        </div>
-        {/* Notification Settings */}
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-semibold mb-4">Notification Settings</h3>
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="emailNotifications"
-                checked={settings.emailNotifications}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Enable email notifications
-            </label>
-          </div>
-        </div>
-        {/* Data Retention Settings */}
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-semibold mb-4">Data Retention</h3>
-          <div className="mb-4">
-            <label className="block mb-2">
-              File Retention Period (days)
+            </Field>
+            <Checkbox
+              name="autoProcessFiles"
+              checked={settings.autoProcessFiles}
+              onChange={handleChange}
+              label="Auto-process uploaded files"
+            />
+          </SectionCard>
+
+          {/* Notification Settings */}
+          <SectionCard title="🔔 Notification Settings">
+            <Checkbox
+              name="emailNotifications"
+              checked={settings.emailNotifications}
+              onChange={handleChange}
+              label="Enable email notifications"
+            />
+          </SectionCard>
+
+          {/* Data Retention */}
+          <SectionCard title="🗃️ Data Retention">
+            <Field label="File Retention Period (days)">
               <input
                 type="number"
                 name="retentionPeriod"
                 value={settings.retentionPeriod}
                 onChange={handleChange}
-                className="mt-1 block w-full border rounded px-3 py-2"
+                className="input"
                 min="1"
                 max="365"
               />
-            </label>
+            </Field>
+          </SectionCard>
+
+          {/* Feature Toggles */}
+          <SectionCard title="🧩 Feature Toggles">
+            <Checkbox
+              name="enable3DCharts"
+              checked={settings.enable3DCharts}
+              onChange={handleChange}
+              label="Enable 3D Charts"
+            />
+            <Checkbox
+              name="enableAISummary"
+              checked={settings.enableAISummary}
+              onChange={handleChange}
+              label="Enable AI Summary"
+            />
+            <Checkbox
+              name="enableExport"
+              checked={settings.enableExport}
+              onChange={handleChange}
+              label="Enable Export (PDF/Image)"
+            />
+          </SectionCard>
+
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl shadow transition"
+            >
+              💾 Save Settings
+            </button>
           </div>
-        </div>
-        {/* Feature Toggles */}
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-semibold mb-4">Feature Toggles</h3>
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="enable3DCharts"
-                checked={settings.enable3DCharts}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Enable 3D Charts
-            </label>
-          </div>
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="enableAISummary"
-                checked={settings.enableAISummary}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Enable AI Summary
-            </label>
-          </div>
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="enableExport"
-                checked={settings.enableExport}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Enable Export (PDF/Image)
-            </label>
-          </div>
-        </div>
-        {/* Save button */}
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Save Settings
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
 
-export default SettingsConfig; 
+// Reusable Components
+const SectionCard = ({ title, children }) => (
+  <div className="bg-white p-6 rounded-2xl shadow-xl space-y-4">
+    <h3 className="text-2xl font-bold text-gray-800 mb-2">{title}</h3>
+    {children}
+  </div>
+);
+
+const Field = ({ label, children }) => (
+  <label className="block text-gray-700 font-medium mb-2">
+    {label}
+    <div>{children}</div>
+  </label>
+);
+
+const Checkbox = ({ name, checked, onChange, label }) => (
+  <label className="flex items-center space-x-2 text-gray-700 font-medium">
+    <input
+      type="checkbox"
+      name={name}
+      checked={checked}
+      onChange={onChange}
+      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+    />
+    <span>{label}</span>
+  </label>
+);
+
+export default SettingsConfig;

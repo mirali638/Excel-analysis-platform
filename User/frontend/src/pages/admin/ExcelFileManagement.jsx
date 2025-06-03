@@ -36,17 +36,14 @@ const ExcelFileManagement = () => {
   const handleDownload = (id) => {
     fetch(`http://localhost:5000/api/admindashboard/excel/files/${id}/download`)
       .then((res) => {
-        if (res.ok) {
-          return res.blob();
-        } else {
-          throw new Error("Download failed");
-        }
+        if (res.ok) return res.blob();
+        throw new Error("Download failed");
       })
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "filename.xlsx"; // You can make this dynamic if you want
+        a.download = files.find((file) => file._id === id)?.originalName || "Unknown";
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -62,162 +59,135 @@ const ExcelFileManagement = () => {
       .catch(() => alert("Failed to load file details"));
   };
 
-  if (loading)
-    return (
-      <div className="p-6 text-center text-gray-600 font-semibold">
-        Loading files...
-      </div>
-    );
-  if (error)
-    return (
-      <div className="p-6 text-center text-red-600 font-semibold">{error}</div>
-    );
-
   return (
-    <div className="p-6 max-w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-        <h2 className="text-3xl font-extrabold tracking-wide text-gray-900">
-          Excel File Management
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-6">
+        <h2 className="text-3xl font-bold text-green-700 text-center mb-10">
+          📁 Excel File Management
         </h2>
       </div>
 
-      {/* Scrollable container to avoid table overflow */}
-      <div className="overflow-x-auto rounded-lg shadow border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200 text-sm sm:text-base table-fixed">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                className="w-1/4 px-2 py-3 text-left font-semibold text-gray-700 uppercase tracking-wide whitespace-normal break-words"
-                style={{ minWidth: "120px" }}
-              >
-                File Name
-              </th>
-              <th
-                className="w-1/5 px-2 py-3 text-left font-semibold text-gray-700 uppercase tracking-wide whitespace-normal break-words"
-                style={{ minWidth: "120px" }}
-              >
-                Uploaded By
-              </th>
-              <th
-                className="w-1/12 px-2 py-3 text-left font-semibold text-gray-700 uppercase tracking-wide whitespace-nowrap"
-                style={{ minWidth: "60px" }}
-              >
-                Size
-              </th>
-              <th
-                className="w-1/12 px-2 py-3 text-left font-semibold text-gray-700 uppercase tracking-wide whitespace-nowrap"
-                style={{ minWidth: "70px" }}
-              >
-                Status
-              </th>
-              <th
-                className="w-1/5 px-2 py-3 text-left font-semibold text-gray-700 uppercase tracking-wide whitespace-normal break-words"
-                style={{ minWidth: "120px" }}
-              >
-                Upload Date
-              </th>
-              <th
-                className="w-1/6 px-2 py-3 text-left font-semibold text-gray-700 uppercase tracking-wide"
-                style={{ minWidth: "140px" }}
-              >
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
-            {files.length === 0 && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="text-center text-gray-500 py-6 select-none"
-                >
-                  No files uploaded yet.
-                </td>
-              </tr>
-            )}
-            {files.map((file) => (
-              <tr key={file._id} className="hover:bg-gray-50 transition">
-                <td
-                  className="px-2 py-3 max-w-[200px] truncate"
-                  title={file.originalName}
-                >
-                  {file.originalName}
-                </td>
-                <td
-                  className="px-2 py-3 max-w-[150px] truncate"
-                  title={file.uploadedBy?.name || "Unknown"}
-                >
-                  {file.uploadedBy?.name || "Unknown"}
-                </td>
-                <td className="px-2 py-3 whitespace-nowrap">{file.size}</td>
-                <td className="px-2 py-3 whitespace-nowrap">
-                  <span
-                    className={`px-3 py-1 inline-block text-xs font-semibold rounded-full select-none ${
-                      file.status === "processed"
-                        ? "bg-green-100 text-green-800"
-                        : file.status === "processing"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {file.status}
-                  </span>
-                </td>
-                <td className="px-2 py-3 whitespace-nowrap text-gray-600">
-                  {new Date(file.createdAt).toLocaleDateString()}
-                </td>
-                <td className="px-2 py-3 whitespace-nowrap">
-                  {/* Vertical stack of action buttons */}
-                  <div className="flex flex-col space-y-2">
-                    <button
-                      onClick={() => handleViewMetadata(file._id)}
-                      className="text-blue-600 hover:text-blue-800 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
-                    >
-                      View Details
-                    </button>
-                    <button
-                      onClick={() => handleDownload(file._id)}
-                      className="text-green-600 hover:text-green-800 font-semibold focus:outline-none focus:ring-2 focus:ring-green-400 rounded"
-                    >
-                      Download
-                    </button>
-                    <button
-                      onClick={() => handleDelete(file._id)}
-                      className="text-red-600 hover:text-red-800 font-semibold focus:outline-none focus:ring-2 focus:ring-red-400 rounded"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {loading && (
+        <div className="text-center text-gray-600 font-medium">Loading files...</div>
+      )}
+      {error && (
+        <div className="text-center text-red-600 font-medium">{error}</div>
+      )}
 
-      {/* Modal for selected file details */}
+      {!loading && !error && (
+        <div className="overflow-x-auto rounded-xl shadow border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 text-sm sm:text-base table-fixed">
+            <thead className="bg-gray-50">
+              <tr>
+                {[
+                  ["File Name", "w-1/4", "120px"],
+                  ["Uploaded By", "w-1/5", "120px"],
+                  ["Size", "w-1/12", "60px"],
+                  ["Status", "w-1/12", "70px"],
+                  ["Upload Date", "w-1/5", "120px"],
+                  ["Actions", "w-1/6", "140px"],
+                ].map(([label, widthClass, minWidth], index) => (
+                  <th
+                    key={index}
+                    className={`${widthClass} px-3 py-3 text-left font-semibold text-gray-700 uppercase tracking-wide whitespace-nowrap`}
+                    style={{ minWidth }}
+                  >
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {files.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="text-center text-gray-500 py-6 select-none"
+                  >
+                    No files uploaded yet.
+                  </td>
+                </tr>
+              ) : (
+                files.map((file) => (
+                  <tr key={file._id} className="hover:bg-gray-50 transition">
+                    <td className="px-3 py-3 truncate" title={file.originalName}>
+                      {file.originalName}
+                    </td>
+                    <td
+                      className="px-3 py-3 truncate"
+                      title={file.uploadedBy?.name || "Unknown"}
+                    >
+                      {file.uploadedBy?.name || "Unknown"}
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">{file.size}</td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span
+                        className={`px-3 py-1 inline-block text-xs font-semibold rounded-full ${
+                          file.status === "processed"
+                            ? "bg-green-100 text-green-800"
+                            : file.status === "processing"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {file.status}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap text-gray-600">
+                      {new Date(file.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => handleViewMetadata(file._id)}
+                          className="text-blue-600 hover:text-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 rounded"
+                        >
+                          View Details
+                        </button>
+                        <button
+                          onClick={() => handleDownload(file._id)}
+                          className="text-green-600 hover:text-green-800 font-medium focus:outline-none focus:ring-2 focus:ring-green-300 rounded"
+                        >
+                          Download
+                        </button>
+                        <button
+                          onClick={() => handleDelete(file._id)}
+                          className="text-red-600 hover:text-red-800 font-medium focus:outline-none focus:ring-2 focus:ring-red-300 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Modal for file details */}
       {selectedFile && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedFile(null)}
         >
           <div
-            className="bg-white rounded-xl shadow-xl max-w-3xl w-full p-6 overflow-y-auto max-h-[80vh]"
+            className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[80vh] overflow-y-auto p-6 relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-4">
               <h3 className="text-2xl font-bold text-gray-900">File Details</h3>
               <button
                 onClick={() => setSelectedFile(null)}
-                className="text-gray-500 hover:text-gray-700 text-2xl font-bold focus:outline-none"
-                aria-label="Close modal"
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
               >
                 &times;
               </button>
             </div>
             <div className="space-y-6 text-gray-800 text-sm sm:text-base">
               <section>
-                <h4 className="font-semibold mb-2 text-gray-900">
+                <h4 className="font-semibold text-gray-900 mb-2">
                   File Information
                 </h4>
                 <p>
@@ -229,7 +199,7 @@ const ExcelFileManagement = () => {
                 <p>
                   <strong>Status:</strong>{" "}
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-semibold select-none ${
+                    className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                       selectedFile.status === "processed"
                         ? "bg-green-100 text-green-800"
                         : selectedFile.status === "processing"
@@ -241,9 +211,8 @@ const ExcelFileManagement = () => {
                   </span>
                 </p>
               </section>
-
               <section>
-                <h4 className="font-semibold mb-2 text-gray-900">
+                <h4 className="font-semibold text-gray-900 mb-2">
                   Upload Information
                 </h4>
                 <p>
@@ -255,17 +224,16 @@ const ExcelFileManagement = () => {
                   {new Date(selectedFile.createdAt).toLocaleString()}
                 </p>
               </section>
-
-              {selectedFile.metadata ? (
-                <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">Metadata</h4>
-                  <pre className="bg-gray-100 rounded p-3 overflow-x-auto text-xs sm:text-sm">
+              <section>
+                <h4 className="font-semibold text-gray-900 mb-2">Metadata</h4>
+                {selectedFile.metadata ? (
+                  <pre className="bg-gray-100 rounded p-4 overflow-x-auto text-xs sm:text-sm">
                     {JSON.stringify(selectedFile.metadata, null, 2)}
                   </pre>
-                </section>
-              ) : (
-                <p className="italic text-gray-600">No metadata available.</p>
-              )}
+                ) : (
+                  <p className="italic text-gray-600">No metadata available.</p>
+                )}
+              </section>
             </div>
           </div>
         </div>

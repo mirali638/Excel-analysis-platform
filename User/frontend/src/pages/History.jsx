@@ -39,7 +39,7 @@ const History = () => {
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <ScrollToTop />
       <div className="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-blue-700 mb-6 text-center">
+        <h1 className="text-3xl font-bold text-green-700 text-center mb-10">
           Your Upload History
         </h1>
 

@@ -1,130 +1,135 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
+const navItems = [
+  { name: "Welcome", path: "/userdashboard/welcome" },
+  { name: "Upload File", path: "/userdashboard/upload" },
+  { name: "Upload History", path: "/userdashboard/history" },
+  { name: "Profile", path: "/userdashboard/profile" },
+  { name: "About", path: "/userdashboard/about" },
+  { name: "Contact Us", path: "/userdashboard/contact" },
+  { name: "Logout", path: "/userdashboard/logout", isLogout: true },
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
-  // Change navbar style when scrolling
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
 
   return (
     <nav
-      className={`${
-        isScrolled ? "bg-green-800" : "bg-transparent"
-      } shadow-md fixed w-full z-10 top-0 left-0 transition-colors duration-300`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-white shadow-lg backdrop-blur-sm bg-opacity-90"
+          : "bg-transparent"
+      }`}
+      style={{ height: "72px" }}
     >
-      <div className=" bg-green-800 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-25">
-          {/* Navbar Brand */}
-          <div className="text-3xl font-bold text-white">
-            Excel Analytics Platform
-          </div>
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-full px-6 md:px-12">
+        {/* Logo and Title */}
+        <Link
+          to="/userdashboard/welcome"
+          className="flex items-center space-x-3 group"
+          aria-label="Excel Analytics Home"
+        >
+          <img
+            src="/Excel_logo.jpg"
+            alt="Excel Logo"
+            className="w-10 h-10 object-contain"
+          />
+          <h1 className="text-xl md:text-2xl font-bold text-green-700 group-hover:text-green-900 transition">
+            Excel Analysis Platform
+          </h1>
+        </Link>
 
-          {/* Desktop menu */}
-          <div className="hidden md:flex space-x-3">
-            {[
-              "welcome",
-              "upload",
-              "history",
-              "profile",
-              "about",
-              "contact",
-              "logout",
-            ].map((item) => (
-              <Link
-                key={item}
-                to={`/userdashboard/${item}`}
-                className={`text-white  hover:text-blue-600 ${
-                  item === "logout" ? "text-red-600 hover:text-red-800" : ""
-                }`}
-              >
-                {item === "upload"
-                  ? "Upload File"
-                  : item === "history"
-                  ? "Upload History"
-                  : item === "contact"
-                  ? "Contact Us"
-                  : item.charAt(0).toUpperCase() + item.slice(1)}
-              </Link>
-            ))}
-          </div>
+        {/* Desktop Links */}
+        <ul className="hidden md:flex space-x-8 font-medium text-gray-700">
+          {navItems.map(({ name, path, isLogout }) => {
+            const isActive = location.pathname === path;
+            return (
+              <li key={name}>
+                <Link
+                  to={path}
+                  className={`relative px-1 py-2 hover:text-green-700 transition-all ${
+                    isLogout
+                      ? "text-red-600 hover:text-red-800"
+                      : isActive
+                      ? "text-green-700 font-semibold"
+                      : ""
+                  }`}
+                >
+                  {name}
+                  {!isLogout && (
+                    <span
+                      className={`absolute left-0 -bottom-0.5 h-0.5 w-full bg-green-700 transform scale-x-0 transition-transform origin-left ${
+                        isActive ? "scale-x-100" : "group-hover:scale-x-100"
+                      }`}
+                    ></span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
 
-          {/* Mobile menu icon */}
-          <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
+        {/* Mobile Hamburger */}
+        <button
+          className="md:hidden relative w-8 h-8 flex flex-col justify-between items-center group"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle menu"
+        >
+          <span
+            className={`block h-1 w-full rounded bg-green-700 transition-transform origin-left ${
+              isOpen ? "rotate-45 translate-y-3" : ""
+            }`}
+          />
+          <span
+            className={`block h-1 w-full rounded bg-green-700 transition-opacity ${
+              isOpen ? "opacity-0" : "opacity-100"
+            }`}
+          />
+          <span
+            className={`block h-1 w-full rounded bg-green-700 transition-transform origin-left ${
+              isOpen ? "-rotate-45 -translate-y-3" : ""
+            }`}
+          />
+        </button>
       </div>
 
-      {/* Mobile dropdown menu */}
-      {isOpen && (
-        <div className="md:hidden bg-white px-4 pb-4 pt-2 space-y-2 shadow">
-          {[
-            "welcome",
-            "upload",
-            "history",
-            "profile",
-            "about",
-            "contact",
-            "logout",
-          ].map((item) => (
-            <Link
-              key={item}
-              to={`/userdashboard/${item}`}
-              onClick={() => setIsOpen(false)}
-              className={`block text-gray-700 ${
-                item === "logout" ? "text-red-600" : ""
-              }`}
-            >
-              {item === "upload"
-                ? "Upload File"
-                : item === "history"
-                ? "Upload History"
-                : item === "contact"
-                ? "Contact Us"
-                : item.charAt(0).toUpperCase() + item.slice(1)}
-            </Link>
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden fixed top-16 left-0 w-full bg-white shadow-lg overflow-hidden transform transition-transform duration-300 ease-in-out ${
+          isOpen ? "max-h-screen" : "max-h-0"
+        }`}
+        style={{ zIndex: 40 }}
+      >
+        <ul className="flex flex-col space-y-4 p-6 font-medium text-gray-700">
+          {navItems.map(({ name, path, isLogout }) => (
+            <li key={name}>
+              <Link
+                to={path}
+                className={`block w-full ${
+                  isLogout ? "text-red-600" : "hover:text-green-700"
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                {name}
+              </Link>
+            </li>
           ))}
-        </div>
-      )}
+        </ul>
+      </div>
     </nav>
   );
 };

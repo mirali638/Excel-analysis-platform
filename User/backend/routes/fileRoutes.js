@@ -2,6 +2,8 @@ const express = require("express");
 const multer = require("multer");
 const jwt = require("jsonwebtoken"); // ✅ REQUIRED to use jwt.verify
 const { uploadFile, getMyUploads } = require("../controllers/fileController");
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
 
@@ -23,7 +25,10 @@ const authenticateJWT = (req, res, next) => {
 
 // 📁 Multer Storage Config
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '..', 'uploads');
+    cb(null, uploadPath);
+  },
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 

@@ -14,6 +14,7 @@
     "axios": "^1.9.0",
     "chart.js": "^4.4.9",
     "file-saver": "^2.0.5",
+    "frontend": "file:",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",

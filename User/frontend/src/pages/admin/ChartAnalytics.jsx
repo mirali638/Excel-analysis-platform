@@ -121,8 +121,8 @@ const ChartAnalytics = () => {
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">
-        Chart Analytics
+      <h2 className="text-3xl font-bold text-green-700 text-center mb-10">
+        📈 Chart Analytics
       </h2>
 
       {/* Filters */}

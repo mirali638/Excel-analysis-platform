@@ -12,7 +12,7 @@ const AdminDashboard = () => {
       const { name, email } = JSON.parse(storedUserInfo);
       setUserInfo({ name, email });
     }
-  }, [location]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -27,14 +27,22 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Top Navigation Bar */}
-      <nav className="bg-white shadow-md">
+      <nav className="bg-white shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between h-20">
-            <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-gray-800 tracking-wide">
+          <div className="flex justify-between items-center h-20">
+            {/* Logo and Title */}
+            <div className="flex items-center space-x-3">
+              <img
+                src="/Excel_logo.jpg"
+                alt="Excel Logo"
+                className="w-10 h-10 object-contain"
+              />
+              <h1 className="text-2xl font-bold text-green-700">
                 Excel Analysis Platform
               </h1>
             </div>
+
+            {/* User Info + Logout */}
             <div className="flex items-center space-x-4">
               {/* User Info */}
               <div className="flex items-center space-x-3 border-r pr-4">
@@ -62,6 +70,7 @@ const AdminDashboard = () => {
         </div>
       </nav>
 
+      {/* Body Layout */}
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 min-h-screen bg-white shadow-md">
@@ -70,94 +79,13 @@ const AdminDashboard = () => {
               Admin Panel
             </h2>
             <nav className="space-y-1">
-              <Link
-                to="/admindashboard"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">🏠</span>
-                Welcome
-              </Link>
-              <Link
-                to="/admindashboard/dashboard"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard/dashboard")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">📊</span>
-                Dashboard Overview
-              </Link>
-              <Link
-                to="/admindashboard/users"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard/users")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">👥</span>
-                User Management
-              </Link>
-              <Link
-                to="/admindashboard/files"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard/files")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">📁</span>
-                Excel File Management
-              </Link>
-              <Link
-                to="/admindashboard/charts"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard/charts")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">📈</span>
-                Chart Analytics
-              </Link>
-              {/* <Link
-                to="/admindashboard/ai-summary"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard/ai-summary")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">🤖</span>
-                AI Summary Monitor
-              </Link> */}
-              <Link
-                to="/admindashboard/logs"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard/logs")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">📝</span>
-                Activity Logs
-              </Link>
-              <Link
-                to="/admindashboard/settings"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive("/admindashboard/settings")
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="mr-3">⚙️</span>
-                Settings & Config
-              </Link>
+              <NavItem path="/admindashboard" icon="🏠" label="Welcome" isActive={isActive} />
+              <NavItem path="/admindashboard/dashboard" icon="📊" label="Dashboard Overview" isActive={isActive} />
+              <NavItem path="/admindashboard/users" icon="👥" label="User Management" isActive={isActive} />
+              <NavItem path="/admindashboard/files" icon="📁" label="Excel File Management" isActive={isActive} />
+              <NavItem path="/admindashboard/charts" icon="📈" label="Chart Analytics" isActive={isActive} />
+              <NavItem path="/admindashboard/logs" icon="📝" label="Activity Logs" isActive={isActive} />
+              <NavItem path="/admindashboard/settings" icon="⚙️" label="Settings & Config" isActive={isActive} />
             </nav>
           </div>
         </aside>
@@ -172,5 +100,20 @@ const AdminDashboard = () => {
     </div>
   );
 };
+
+// Reusable Sidebar Link Component
+const NavItem = ({ path, icon, label, isActive }) => (
+  <Link
+    to={path}
+    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+      isActive(path)
+        ? "bg-blue-50 text-blue-700"
+        : "text-gray-600 hover:bg-gray-50"
+    }`}
+  >
+    <span className="mr-3">{icon}</span>
+    {label}
+  </Link>
+);
 
 export default AdminDashboard;

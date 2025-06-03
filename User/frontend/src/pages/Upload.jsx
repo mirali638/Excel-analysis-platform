@@ -318,12 +318,56 @@ const Upload = () => {
         📊 Excel Chart Visualizer <span className="text-sm">(2D / 3D)</span>
       </h2>
 
-      <input
+      {/* <input
         type="file"
         accept=".xlsx,.xls"
         onChange={handleFileUpload}
         className="mb-6 block w-full text-sm text-gray-700 border border-gray-300 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200 transition"
-      />
+      /> */}
+      <div
+  className={`mb-6 transition-all border-4 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center ${
+    selectedFile ? "border-green-500 bg-green-50" : "border-gray-300"
+  }`}
+  onDragOver={(e) => {
+    e.preventDefault();
+    e.currentTarget.classList.add("border-green-500", "bg-green-50");
+  }}
+  onDragLeave={(e) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove("border-green-500", "bg-green-50");
+  }}
+  onDrop={(e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload({ target: { files: [file] } });
+    e.currentTarget.classList.remove("border-green-500", "bg-green-50");
+  }}
+>
+  <img
+    src="https://cdn-icons-png.flaticon.com/512/724/724933.png"
+    alt="upload"
+    className="w-16 h-16 mb-4 opacity-60"
+  />
+  <p className="font-semibold text-lg text-center">
+    Drag & drop your Excel file here
+  </p>
+  <p className="text-sm text-gray-500 mb-2 text-center">or</p>
+  <label className="inline-block cursor-pointer bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition">
+    Choose File
+    <input
+      type="file"
+      accept=".xlsx,.xls"
+      onChange={handleFileUpload}
+      className="hidden"
+    />
+  </label>
+  {selectedFile && (
+    <p className="mt-4 text-green-700 font-medium">
+      Uploaded: {selectedFile.name}
+    </p>
+  )}
+</div>
+
 
       {columns.length > 0 && (
         <>

@@ -27,12 +27,16 @@ const Contact = () => {
     setStatus({ loading: true, success: null, error: null });
 
     try {
-      const res = await axios.post("http://localhost:5000/api/contact", formData);
+      const res = await axios.post(
+        "http://localhost:5000/api/contact",
+        formData
+      );
       setStatus({ loading: false, success: res.data.message, error: null });
       setFormData({ fullName: "", email: "", message: "" });
     } catch (err) {
       const errorMsg =
-        err.response?.data?.message || "Something went wrong. Please try again.";
+        err.response?.data?.message ||
+        "Something went wrong. Please try again.";
       setStatus({ loading: false, success: null, error: errorMsg });
     }
   };
@@ -57,8 +61,12 @@ const Contact = () => {
               <p className="text-gray-700">+1 (555) 123-4567</p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-green-700">📍 Address</h4>
-              <p className="text-gray-700">123 Data Street, Analytics City, CA 94000</p>
+              <h4 className="text-lg font-semibold text-green-700">
+                📍 Address
+              </h4>
+              <p className="text-gray-700">
+                123 Data Street, Analytics City, CA 94000
+              </p>
             </div>
             <div className="pt-4">
               <img
@@ -86,7 +94,9 @@ const Contact = () => {
               />
             </div>
             <div>
-              <label className="block text-green-800 font-medium mb-2">Email</label>
+              <label className="block text-green-800 font-medium mb-2">
+                Email
+              </label>
               <input
                 type="email"
                 name="email"
@@ -98,7 +108,9 @@ const Contact = () => {
               />
             </div>
             <div>
-              <label className="block text-green-800 font-medium mb-2">Message</label>
+              <label className="block text-green-800 font-medium mb-2">
+                Message
+              </label>
               <textarea
                 name="message"
                 value={formData.message}

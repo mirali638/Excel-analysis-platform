@@ -3,18 +3,27 @@ const Profile = require("../models/Profile");
 // Get or auto-create profile, and update profile
 const getProfile = async (req, res) => {
   try {
-    let profile = await Profile.findOne({ user_id: req.user.id }).select(
-      "-__v"
-    );
+    // First try to find profile by user_id
+    let profile = await Profile.findOne({ user_id: req.user.id }).select("-__v");
 
     if (!profile) {
-      profile = await Profile.create({
-        user_id: req.user.id,
-        name: req.user.name || "",
-        email: req.user.email || "",
-        phone: "",
-        address: "",
-      });
+      // If no profile found by user_id, check if one exists with the email
+      profile = await Profile.findOne({ email: req.user.email }).select("-__v");
+      
+      if (profile) {
+        // If profile exists with email, update the user_id
+        profile.user_id = req.user.id;
+        await profile.save();
+      } else {
+        // If no profile exists at all, create a new one
+        profile = await Profile.create({
+          user_id: req.user.id,
+          name: req.user.name || "",
+          email: req.user.email || "",
+          phone: "",
+          address: "",
+        });
+      }
     }
 
     res.json(profile);

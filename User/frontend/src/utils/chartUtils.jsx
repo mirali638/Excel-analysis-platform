@@ -402,24 +402,6 @@ export const render3DChart = (threeRef, excelData, xAxis, yAxis, chartType) => {
           sphere.receiveShadow = true;
           scene.add(sphere);
            console.log(`Added sphere at point ${idx}.`);
-
-          // Add value label at each point
-          const labelCanvas = document.createElement('canvas');
-          const context = labelCanvas.getContext('2d');
-          canvas.width = 128; // Smaller canvas for just value
-          canvas.height = 32;
-          context.fillStyle = '#000000';
-          context.font = '18px Arial';
-          context.textAlign = 'center';
-          context.fillText(val.toString(), 64, 20); // Center text
-
-          const texture = new THREE.CanvasTexture(labelCanvas);
-          const labelMaterial = new THREE.SpriteMaterial({ map: texture });
-          const label = new THREE.Sprite(labelMaterial);
-          label.position.set(x, y + pointRadius + 0.5, z); // Position slightly above the point
-          label.scale.set(1.5, 0.5, 1); // Scale label
-          scene.add(label);
-           console.log(`Added label at point ${idx}.`);
       });
 
       chartDisplayWidth = (values.length - 1) * spacing;
@@ -574,32 +556,6 @@ export const render3DChart = (threeRef, excelData, xAxis, yAxis, chartType) => {
       const radarAxes = new THREE.LineLoop(pointsGeometry, lineMaterial);
       scene.add(radarAxes);
 
-      // Add value labels at each point
-      values.forEach((val, idx) => {
-          const angle = idx * angleIncrement;
-          const currentRadius = (val / maxRadarValue) * radarRadius;
-          const x = currentRadius * Math.cos(angle);
-          const y = currentRadius * Math.sin(angle);
-          const z = depth / 2 + 0.5; // Position slightly above the radar mesh
-
-          const labelCanvas = document.createElement('canvas');
-          const context = labelCanvas.getContext('2d');
-          canvas.width = 128; // Smaller canvas for just value
-          canvas.height = 32;
-          context.fillStyle = '#000000';
-          context.font = '18px Arial';
-          context.textAlign = 'center';
-          context.fillText(val.toString(), 64, 20); // Center text
-
-          const texture = new THREE.CanvasTexture(labelCanvas);
-          const labelMaterial = new THREE.SpriteMaterial({ map: texture });
-          const label = new THREE.Sprite(labelMaterial);
-          label.position.set(x * 1.1, y * 1.1, z); // Position slightly outside the point
-          label.scale.set(1.5, 0.5, 1); // Scale label
-          scene.add(label);
-           console.log(`Added label at point ${idx}.`);
-      });
-
       chartDisplayWidth = radarRadius * 2;
       chartDisplayDepth = radarRadius * 2;
       cameraTargetY = depth / 2;
@@ -681,30 +637,6 @@ export const render3DChart = (threeRef, excelData, xAxis, yAxis, chartType) => {
        scene.add(areaChartMesh);
        console.log(`Added 3D area mesh.`);
 
-       // Add value labels along the top edge
-       values.forEach((val, idx) => {
-           const x = idx * areaSpacing;
-           const y = val / maxValue * 10 + 0.2; // Position slightly above the area top
-           const z = areaDepth / 2; // Position in the middle of the area thickness
-
-           const labelCanvas = document.createElement('canvas');
-           const context = labelCanvas.getContext('2d');
-           canvas.width = 128; // Smaller canvas for just value
-           canvas.height = 32;
-           context.fillStyle = '#000000';
-           context.font = '18px Arial';
-           context.textAlign = 'center';
-           context.fillText(val.toString(), 64, 20); // Center text
-
-           const texture = new THREE.CanvasTexture(labelCanvas);
-           const labelMaterial = new THREE.SpriteMaterial({ map: texture });
-           const label = new THREE.Sprite(labelMaterial);
-           label.position.set(x, y, z); // Position at the point
-           label.scale.set(1.5, 0.5, 1); // Scale label
-           scene.add(label);
-            console.log(`Added label at point ${idx}.`);
-       });
-
        chartDisplayWidth = (values.length - 1) * areaSpacing; // Use area spacing for width
        chartDisplayDepth = areaDepth; // Use area depth for depth
        cameraTargetY = (maxValue / 2 * 10) / 2; // Target center of the height
@@ -738,30 +670,6 @@ export const render3DChart = (threeRef, excelData, xAxis, yAxis, chartType) => {
       });
       console.log(`Added ${values.length} scatter points.`);
 
-       // Add value labels at each point
-       values.forEach((val, idx) => {
-           const x = idx * spacing;
-           const y = val / maxValue * 10;
-           const z = 0; // Same Z as the point
-
-           const labelCanvas = document.createElement('canvas');
-           const context = labelCanvas.getContext('2d');
-           canvas.width = 128; // Smaller canvas for just value
-           canvas.height = 32;
-           context.fillStyle = '#000000';
-           context.font = '18px Arial';
-           context.textAlign = 'center';
-           context.fillText(val.toString(), 64, 20); // Center text
-
-           const texture = new THREE.CanvasTexture(labelCanvas);
-           const labelMaterial = new THREE.SpriteMaterial({ map: texture });
-           const label = new THREE.Sprite(labelMaterial);
-           label.position.set(x, y + pointRadius + 0.5, z); // Position slightly above the point
-           label.scale.set(1.5, 0.5, 1); // Scale label
-           scene.add(label);
-            console.log(`Added label at point ${idx}.`);
-       });
-
        camera.position.set(chartDisplayWidth / 2, maxValue * 1.5, chartDisplayWidth * 1.5);
        camera.lookAt(new THREE.Vector3(chartDisplayWidth / 2, maxValue / 2, 0));
        controls.target.set(chartDisplayWidth / 2, maxValue / 2, 0);
@@ -781,6 +689,13 @@ export const render3DChart = (threeRef, excelData, xAxis, yAxis, chartType) => {
   pointLight.position.set(-10, 10, -10);
   scene.add(pointLight);
   console.log("Lighting added.");
+
+  // Add a grid helper (shared for all 3D charts)
+   // Determine grid size based on the largest dimension of the chart type
+  const gridHelper = new THREE.GridHelper(gridHelperSize, 20, 0x000000, 0x000000);
+  gridHelper.position.y = -0.1;
+  scene.add(gridHelper);
+  console.log("Grid helper added.");
 
   console.log("Camera positioned and looking at target.");
 

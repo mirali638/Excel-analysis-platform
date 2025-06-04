@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import { Bar, Line, Pie, Doughnut, Radar } from "react-chartjs-2";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Bar, Line, Pie, Doughnut, Radar, Scatter } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   BarElement,
@@ -14,9 +15,13 @@ import {
   Tooltip,
   Legend,
   RadialLinearScale,
+  Filler,
 } from "chart.js";
 import * as THREE from "three";
 import jsPDF from "jspdf";
+
+// Import chart utility functions
+import { generateChartData, render2DChart, render3DChart, generateColors } from "../utils/chartUtils.jsx";
 
 ChartJS.register(
   BarElement,
@@ -27,7 +32,8 @@ ChartJS.register(
   PointElement,
   Tooltip,
   Legend,
-  RadialLinearScale
+  RadialLinearScale,
+  Filler
 );
 
 const Upload = () => {
@@ -42,6 +48,20 @@ const Upload = () => {
 
   const chartRef = useRef(null);
   const threeRef = useRef(null);
+
+  // Generate a beautiful color palette
+  const generateColors = (count) => {
+    const baseColors = [
+      'rgba(54, 162, 235, 0.8)',  // Blue
+      'rgba(75, 192, 192, 0.8)',  // Teal
+      'rgba(153, 102, 255, 0.8)', // Purple
+      'rgba(255, 159, 64, 0.8)',  // Orange
+      'rgba(255, 99, 132, 0.8)',  // Pink
+      'rgba(255, 206, 86, 0.8)',  // Yellow
+      'rgba(75, 192, 192, 0.8)',  // Green
+    ];
+    return Array(count).fill(0).map((_, i) => baseColors[i % baseColors.length]);
+  };
 
   useEffect(() => {
     setChartData(null);
@@ -97,55 +117,16 @@ const Upload = () => {
   const generateChart = () => {
     if (
       !xAxis ||
-      (!yAxis && !["pie", "doughnut"].includes(chartType)) ||
+      (!yAxis && !["pie", "radar", "area", "scatter"].includes(chartType)) ||
       !selectedFile
     ) {
       alert("Please upload file and select appropriate axes.");
       return;
     }
 
-    const labels = excelData.map((row) => row[xAxis]);
-    const values = excelData.map((row) => Number(row[yAxis]) || 0);
-
-    if (["pie", "doughnut"].includes(chartType)) {
-      const aggregated = {};
-      labels.forEach((label, idx) => {
-        aggregated[label] = (aggregated[label] || 0) + values[idx];
-      });
-
-      const finalLabels = Object.keys(aggregated);
-      const finalValues = Object.values(aggregated);
-      const colors = finalLabels.map(
-        (_, i) => `hsl(${(i * 137.5) % 360}, 70%, 60%)`
-      );
-
-      setChartData({
-        labels: finalLabels,
-        datasets: [
-          {
-            label: `${yAxis} by ${xAxis}`,
-            data: finalValues,
-            backgroundColor: colors,
-            borderColor: "white",
-            borderWidth: 2,
-            hoverOffset: 10,
-          },
-        ],
-      });
-    } else {
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: `${yAxis} by ${xAxis}`,
-            data: values,
-            backgroundColor: "rgba(33, 115, 70, 0.6)",
-            borderColor: "rgba(33, 115, 70, 1)",
-            borderWidth: 1,
-          },
-        ],
-      });
-    }
+    // Use the utility function to generate chart data
+    const newChartData = generateChartData(excelData, xAxis, yAxis, chartType);
+    setChartData(newChartData);
 
     // Store chart image after rendering
     setTimeout(async () => {
@@ -199,65 +180,28 @@ const Upload = () => {
     }, 1000);
   };
 
-  const render3DChart = () => {
-    if (!threeRef.current || !xAxis || !yAxis || !excelData.length) return;
-    threeRef.current.innerHTML = "";
-
-    const width = threeRef.current.offsetWidth;
-    const height = 400;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(width, height);
-    threeRef.current.appendChild(renderer.domElement);
-
-    const labels = excelData.map((row) => row[xAxis]);
-    const values = excelData.map((row) => Number(row[yAxis]) || 0);
-    const barWidth = 1;
-    const spacing = 1.5;
-
-    values.forEach((val, idx) => {
-      const geometry = new THREE.BoxGeometry(barWidth, val, barWidth);
-      const material = new THREE.MeshStandardMaterial({ color: 0x217346 });
-      const cube = new THREE.Mesh(geometry, material);
-      cube.position.x = idx * spacing;
-      cube.position.y = val / 2;
-      scene.add(cube);
-    });
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    const light = new THREE.DirectionalLight(0xffffff, 0.5);
-    light.position.set(10, 10, 10).normalize();
-    scene.add(light);
-
-    camera.position.set(
-      (values.length * spacing) / 2,
-      Math.max(...values) * 1.5,
-      values.length
-    );
-    camera.lookAt(new THREE.Vector3((values.length * spacing) / 2, 0, 0));
-
-    const animate = () => {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    };
-    animate();
-  };
-
   useEffect(() => {
+    console.log("useEffect for 3D chart triggered.", { dimension, chartType, excelDataLength: excelData.length, xAxis, yAxis });
     if (
       dimension === "3D" &&
-      chartType === "bar" &&
+      (chartType === "bar" || chartType === "line" || chartType === "pie" || chartType === "radar" || chartType === "area" || chartType === "scatter") &&
       excelData.length > 0 &&
       xAxis &&
       yAxis
     ) {
-      render3DChart();
+      console.log("Conditions met for rendering 3D chart.");
+      // Use the utility function to render the 3D chart
+      const cleanup3D = render3DChart(threeRef, excelData, xAxis, yAxis, chartType);
+      return cleanup3D; // Return cleanup function
     } else if (threeRef.current) {
-      threeRef.current.innerHTML = "";
+      console.log("Conditions not met for 3D chart. Clearing threeRef.");
+      threeRef.current.innerHTML = ""; // Clear 3D container if not rendering 3D
     }
-  }, [dimension, chartType, excelData, xAxis, yAxis]);
+     return () => {
+        console.log("useEffect cleanup (no 3D chart rendered).");
+        // No specific cleanup needed if render3DChart wasn't called, but return empty cleanup for consistency
+     };
+  }, [dimension, chartType, excelData, xAxis, yAxis]); // Depend on relevant state variables
 
   const downloadChart = (format) => {
     let imageData;
@@ -284,90 +228,57 @@ const Upload = () => {
     }
   };
 
-  const render2DChart = () => {
-    if (!chartData) return null;
+  // Render 2D chart using the utility function
+  const render2DChartComponent = render2DChart(chartData, chartType, xAxis, yAxis, chartRef);
 
-    const chartProps = {
-      data: chartData,
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: `${chartType} - ${xAxis} vs ${yAxis}`,
-          },
-        },
-      },
-    };
-
-    const ChartComponent = {
-      bar: Bar,
-      line: Line,
-      pie: Pie,
-      doughnut: Doughnut,
-      radar: Radar,
-    }[chartType];
-
-    if (!ChartComponent) return <p>Unsupported chart type</p>;
-
-    return <ChartComponent ref={chartRef} {...chartProps} />;
-  };
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-extrabold text-center text-green-700 mb-8">
-        📊 Excel Chart Visualizer <span className="text-sm">(2D / 3D)</span>
+         Excel Chart Visualizer <span className="text-sm">(2D / 3D)</span>
       </h2>
 
-      {/* <input
-        type="file"
-        accept=".xlsx,.xls"
-        onChange={handleFileUpload}
-        className="mb-6 block w-full text-sm text-gray-700 border border-gray-300 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200 transition"
-      /> */}
       <div
-  className={`mb-6 transition-all border-4 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center ${
-    selectedFile ? "border-green-500 bg-green-50" : "border-gray-300"
-  }`}
-  onDragOver={(e) => {
-    e.preventDefault();
-    e.currentTarget.classList.add("border-green-500", "bg-green-50");
-  }}
-  onDragLeave={(e) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove("border-green-500", "bg-green-50");
-  }}
-  onDrop={(e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileUpload({ target: { files: [file] } });
-    e.currentTarget.classList.remove("border-green-500", "bg-green-50");
-  }}
->
-  <img
-    src="https://cdn-icons-png.flaticon.com/512/724/724933.png"
-    alt="upload"
-    className="w-16 h-16 mb-4 opacity-60"
-  />
-  <p className="font-semibold text-lg text-center">
-    Drag & drop your Excel file here
-  </p>
-  <p className="text-sm text-gray-500 mb-2 text-center">or</p>
-  <label className="inline-block cursor-pointer bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition">
-    Choose File
-    <input
-      type="file"
-      accept=".xlsx,.xls"
-      onChange={handleFileUpload}
-      className="hidden"
-    />
-  </label>
-  {selectedFile && (
-    <p className="mt-4 text-green-700 font-medium">
-      Uploaded: {selectedFile.name}
-    </p>
-  )}
-</div>
-
+        className={`mb-6 transition-all border-4 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center ${selectedFile ? "border-green-500 bg-green-50" : "border-gray-300"
+          }`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.currentTarget.classList.add("border-green-500", "bg-green-50");
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          e.currentTarget.classList.remove("border-green-500", "bg-green-50");
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          const file = e.dataTransfer.files[0];
+          if (file) handleFileUpload({ target: { files: [file] } });
+          e.currentTarget.classList.remove("border-green-500", "bg-green-50");
+        }}
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/724/724933.png"
+          alt="upload"
+          className="w-16 h-16 mb-4 opacity-60"
+        />
+        <p className="font-semibold text-lg text-center">
+          Drag & drop your Excel file here
+        </p>
+        <p className="text-sm text-gray-500 mb-2 text-center">or</p>
+        <label className="inline-block cursor-pointer bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition">
+          Choose File
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+        </label>
+        {selectedFile && (
+          <p className="mt-4 text-green-700 font-medium">
+            Uploaded: {selectedFile.name}
+          </p>
+        )}
+      </div>
 
       {columns.length > 0 && (
         <>
@@ -421,8 +332,9 @@ const Upload = () => {
                 <option value="bar">Bar</option>
                 <option value="line">Line</option>
                 <option value="pie">Pie</option>
-                <option value="doughnut">Doughnut</option>
                 <option value="radar">Radar</option>
+                <option value="area">Area</option>
+                <option value="scatter">Scatter</option>
               </select>
             </div>
             <div>
@@ -449,7 +361,7 @@ const Upload = () => {
         </>
       )}
 
-      {dimension === "2D" && chartData && <div>{render2DChart()}</div>}
+      {dimension === "2D" && chartData && <div>{render2DChartComponent}</div>}
       {dimension === "3D" && <div ref={threeRef} className="h-96 w-full"></div>}
 
       {chartData && (

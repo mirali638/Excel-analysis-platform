@@ -224,7 +224,7 @@ const ChartAnalytics = () => {
             id={`chart-export-${chart._id}`}
             key={`export-${chart._id}`}
             style={{
-              width: "600px",
+              width: "600px", // Ensure a consistent width for capture
               background: "#fff",
               padding: "20px",
               boxShadow: "0 0 10px rgba(0,0,0,0.1)",
@@ -240,7 +240,12 @@ const ChartAnalytics = () => {
             <p>
               <strong>Date:</strong> {chart.date}
             </p>
-            <ChartComponent chartData={chart} />
+            {/* Use the saved image directly for export */}
+            {chart.image ? (
+              <img src={chart.image} alt={chart.title} style={{ width: '100%', height: 'auto' }} />
+            ) : (
+              <p>Image not available for this chart.</p>
+            )}
           </div>
         ))}
       </div>

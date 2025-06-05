@@ -25,6 +25,7 @@ ChartJS.register(
   Tooltip,
   Legend,
   RadialLinearScale,
+  
   Filler
 );
 

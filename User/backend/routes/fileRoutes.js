@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
-const jwt = require("jsonwebtoken"); // ✅ REQUIRED to use jwt.verify
-const { uploadFile, getMyUploads } = require("../controllers/fileController");
+const jwt = require("jsonwebtoken");
+const { uploadFile, getMyUploads, downloadFile } = require("../controllers/fileController");
 const path = require('path');
 const fs = require('fs');
 
@@ -23,19 +23,41 @@ const authenticateJWT = (req, res, next) => {
   }
 };
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // 📁 Multer Storage Config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '..', 'uploads');
-    cb(null, uploadPath);
+    cb(null, uploadsDir);
   },
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+  filename: (req, file, cb) => {
+    // Create a unique filename that includes the original name
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, uniqueSuffix + ext);
+  }
 });
 
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Accept only Excel files
+    if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        file.mimetype === 'application/vnd.ms-excel') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only Excel files are allowed!'), false);
+    }
+  }
+});
 
 // 📤 Routes
 router.post("/upload", authenticateJWT, upload.single("file"), uploadFile);
 router.get("/my-uploads", authenticateJWT, getMyUploads);
+router.get("/download/:fileId", authenticateJWT, downloadFile);
 
 module.exports = router;

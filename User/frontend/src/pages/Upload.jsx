@@ -334,7 +334,7 @@ const Upload = () => {
                 <option value="pie">Pie</option>
                 <option value="radar">Radar</option>
                 <option value="area">Area</option>
-                <option value="scatter">Scatter</option>
+                {/* <option value="scatter">Scatter</option> */}
               </select>
             </div>
             <div>

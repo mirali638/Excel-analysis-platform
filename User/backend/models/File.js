@@ -12,7 +12,7 @@ const fileSchema = new mongoose.Schema(
       required: true,
     },
     size: {
-      type: Number, // in bytes
+      type: Number,
       required: true,
     },
     status: {
@@ -20,20 +20,37 @@ const fileSchema = new mongoose.Schema(
       enum: ["pending", "processed", "error"],
       default: "pending",
     },
-    filePath: {
-      type: String,
-      required: true,
-    },
     originalName: {
       type: String,
       required: true,
     },
     rowCount: {
       type: Number,
-      required: true, // if always available
+      required: true,
     },
+    metadata: {
+      fileType: String,
+      lastModified: Date
+    },
+    fileType: {
+      type: String,
+      enum: ['xlsx', 'xls', 'csv'],
+      required: true
+    }
   },
-  { timestamps: true } // includes createdAt, updatedAt
+  { 
+    timestamps: true
+  }
 );
+
+// Virtual for formatted size
+fileSchema.virtual('formattedSize').get(function() {
+  const bytes = this.size;
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+});
 
 module.exports = mongoose.model("File", fileSchema);

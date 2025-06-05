@@ -1,15 +1,34 @@
 const File = require("../models/File");
 const XLSX = require("xlsx");
 const fs = require("fs");
+const path = require('path');
 const logActivity = require("../utils/LogActivity");
 
-async function processFile(filePath) {
+// Helper function to get the uploads directory path
+const getUploadsDir = () => path.join(__dirname, '..', 'uploads');
+
+async function processFile(filePath, fileType) {
   try {
-    // Simulate processing (replace with your logic if needed)
-    return { success: true };
+    const fileBuffer = fs.readFileSync(filePath);
+    const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    // Get row count
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+    const rowCount = jsonData.length;
+
+    return {
+      success: true,
+      metadata: {
+        rowCount,
+        fileType,
+        lastModified: new Date()
+      }
+    };
   } catch (error) {
     console.error("Error processing file:", error);
-    return { success: false };
+    return { success: false, error: error.message };
   }
 }
 
@@ -20,27 +39,25 @@ exports.uploadFile = async (req, res) => {
     }
 
     const filePath = req.file.path;
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileType = path.extname(req.file.originalname).toLowerCase().substring(1);
 
-    // Read Excel/CSV
-    const workbook = XLSX.read(fileBuffer, { type: "buffer" });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
+    // Process the file and get metadata
+    const processResult = await processFile(filePath, fileType);
 
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-      defval: "", // default value for empty cells
-    });
-
-    const rowCount = jsonData.length;
+    if (!processResult.success) {
+      return res.status(500).json({ error: "File processing failed" });
+    }
 
     const newFile = new File({
       filename: req.file.filename,
       originalName: req.file.originalname,
-      filePath: filePath,
+      filePath: req.file.filename,
       size: req.file.size,
       uploadedBy: req.user.id,
-      rowCount: rowCount,
-      status: "pending",
+      rowCount: processResult.metadata.rowCount,
+      status: "processed",
+      fileType: fileType,
+      metadata: processResult.metadata
     });
 
     await newFile.save();
@@ -51,14 +68,8 @@ exports.uploadFile = async (req, res) => {
       userId: user.id,
       username: user.name || user.email,
       action: "File Upload",
-      details: `Uploaded Excel file: ${req.file.originalname}`,
+      details: `Uploaded ${fileType.toUpperCase()} file: ${req.file.originalname}`,
     });
-
-    // File Processing
-    const processResult = await processFile(filePath);
-
-    newFile.status = processResult.success ? "processed" : "error";
-    await newFile.save();
 
     res.status(201).json({
       message: "File uploaded and processed",
@@ -85,5 +96,36 @@ exports.getMyUploads = async (req, res) => {
   } catch (err) {
     console.error("Fetch my uploads error:", err);
     res.status(500).json({ error: "Failed to fetch uploads" });
+  }
+};
+
+exports.downloadFile = async (req, res) => {
+  try {
+    const fileId = req.params.fileId;
+    const file = await File.findOne({ _id: fileId, uploadedBy: req.user.id });
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    const filePath = path.join(getUploadsDir(), file.filename);
+    
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: "File not found on server" });
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.on('error', (error) => {
+      console.error('Error streaming file:', error);
+      res.status(500).json({ error: "Error streaming file" });
+    });
+    fileStream.pipe(res);
+
+  } catch (err) {
+    console.error("Error downloading file:", err);
+    res.status(500).json({ error: "Failed to download file" });
   }
 };

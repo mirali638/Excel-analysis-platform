@@ -8,13 +8,18 @@ const ExcelFileManagement = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:5000/api/admindashboard/excel/files")
+    const token = localStorage.getItem('token');
+    fetch("http://localhost:5000/api/admindashboard/files", {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then((res) => res.json())
       .then((data) => {
         setFiles(data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
         setError("Failed to load files");
         setLoading(false);
       });
@@ -22,42 +27,71 @@ const ExcelFileManagement = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this file?")) {
-      fetch(`http://localhost:5000/api/admindashboard/excel/files/${id}`, {
+      const token = localStorage.getItem('token');
+      fetch(`http://localhost:5000/api/admindashboard/files/${id}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       })
         .then((res) => {
           if (!res.ok) throw new Error("Delete failed");
           setFiles(files.filter((file) => file._id !== id));
         })
-        .catch(() => alert("Failed to delete file"));
+        .catch(() => {
+          alert("Failed to delete file");
+        });
     }
   };
 
   const handleDownload = (id) => {
-    fetch(`http://localhost:5000/api/admindashboard/excel/files/${id}/download`)
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Authentication token not found. Please log in again.');
+      return;
+    }
+
+    fetch(`http://localhost:5000/api/admindashboard/files/${id}/download`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then((res) => {
-        if (res.ok) return res.blob();
-        throw new Error("Download failed");
+        if (!res.ok) {
+          return res.json().then(err => {
+            throw new Error(err.message || 'Download failed');
+          });
+        }
+        return res.blob();
       })
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download =
-          files.find((file) => file._id === id)?.originalName || "Unknown";
+        const fileName = files.find((file) => file._id === id)?.originalName || "Unknown";
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
       })
-      .catch(() => alert("Download failed"));
+      .catch((error) => {
+        alert(error.message || "Failed to download file. Please try again.");
+      });
   };
 
   const handleViewMetadata = (id) => {
-    fetch(`http://localhost:5000/api/admindashboard/excel/files/${id}`)
+    const token = localStorage.getItem('token');
+    fetch(`http://localhost:5000/api/admindashboard/files/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then((res) => res.json())
       .then((data) => setSelectedFile(data))
-      .catch(() => alert("Failed to load file details"));
+      .catch(() => {
+        alert("Failed to load file details");
+      });
   };
 
   return (
@@ -88,7 +122,6 @@ const ExcelFileManagement = () => {
                 className="rounded-2xl border border-gray-200 shadow-lg p-5 flex flex-col justify-between group max-w-full
                   transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-green-400"
               >
-                {/* File Details */}
                 <div className="mb-4 space-y-1 text-gray-700 leading-relaxed">
                   <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-green-700 transition">
                     {file.originalName}
@@ -98,10 +131,6 @@ const ExcelFileManagement = () => {
                     <span className="not-italic text-gray-700 font-medium">
                       {file.uploadedBy?.name || "Unknown"}
                     </span>
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    📦 Size:{" "}
-                    <span className="font-medium text-black">{file.size}</span>
                   </p>
                   <p className="text-sm text-gray-600">
                     🧭 Status:{" "}
@@ -117,17 +146,10 @@ const ExcelFileManagement = () => {
                       {file.status}
                     </span>
                   </p>
-                  <p className="text-sm text-gray-500">
-                    📅 Uploaded:{" "}
-                    <span className="text-gray-800 font-medium">
-                      {new Date(file.createdAt).toLocaleDateString()}
-                    </span>
-                  </p>
                 </div>
 
                 <hr className="border-t border-dashed border-gray-300 my-3" />
 
-                {/* Action Buttons */}
                 <div className="flex flex-col gap-2 text-sm">
                   <button
                     onClick={() => handleViewMetadata(file._id)}
@@ -154,7 +176,6 @@ const ExcelFileManagement = () => {
         </div>
       )}
 
-      {/* Modal for File Metadata */}
       {selectedFile && (
         <div
           className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
@@ -199,6 +220,12 @@ const ExcelFileManagement = () => {
                     {selectedFile.status}
                   </span>
                 </p>
+                <p>
+                  <strong>File Type:</strong>{" "}
+                  <span className="text-blue-600 font-medium">
+                    {selectedFile.originalName.split('.').pop().toUpperCase()}
+                  </span>
+                </p>
               </section>
 
               <section>
@@ -211,19 +238,27 @@ const ExcelFileManagement = () => {
                 </p>
                 <p>
                   <strong>Date:</strong>{" "}
-                  {new Date(selectedFile.createdAt).toLocaleString()}
+                  {new Date(selectedFile.createdAt).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Time:</strong>{" "}
+                  {new Date(selectedFile.createdAt).toLocaleTimeString()}
                 </p>
               </section>
 
               <section>
-                <h4 className="font-semibold text-gray-900 mb-2">Metadata</h4>
-                {selectedFile.metadata ? (
-                  <pre className="bg-gray-100 rounded p-4 overflow-x-auto text-xs sm:text-sm">
-                    {JSON.stringify(selectedFile.metadata, null, 2)}
-                  </pre>
-                ) : (
-                  <p className="italic text-gray-600">No metadata available.</p>
-                )}
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Metadata
+                </h4>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="mb-2">
+                    <strong>Total Rows:</strong> {selectedFile.rowCount}
+                  </p>
+                  <p>
+                    <strong>Last Modified:</strong>{" "}
+                    {new Date(selectedFile.metadata?.lastModified || selectedFile.updatedAt).toLocaleString()}
+                  </p>
+                </div>
               </section>
             </div>
           </div>

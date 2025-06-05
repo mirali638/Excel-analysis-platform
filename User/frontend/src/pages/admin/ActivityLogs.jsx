@@ -32,20 +32,40 @@ const ActivityLogs = () => {
   });
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold text-green-700 text-center mb-10">
+    <div className="p-8 max-w-7xl mx-auto bg-gradient-to-br from-green-50 via-white to-green-50 min-h-screen">
+      <div className="mb-10">
+        <h2 className="text-4xl font-extrabold text-green-800 text-center drop-shadow-md">
           📋 Activity Logs
         </h2>
       </div>
 
       {/* Filter */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <label className="text-gray-700 font-medium">Filter by Activity:</label>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <label
+          htmlFor="filter"
+          className="text-lg font-semibold text-green-700 select-none"
+        >
+          Filter by Activity:
+        </label>
         <select
+          id="filter"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition w-full sm:w-64"
+          className="
+            w-full sm:w-72
+            border-2 border-green-400
+            rounded-xl
+            px-5 py-3
+            text-green-900
+            text-lg
+            font-medium
+            shadow-md
+            transition
+            focus:outline-none focus:ring-4 focus:ring-green-300
+            hover:border-green-600
+            cursor-pointer
+            bg-gradient-to-r from-green-100 via-green-50 to-green-100
+            "
         >
           <option value="all">All Activities</option>
           <option value="login">Login Activities</option>
@@ -56,74 +76,77 @@ const ActivityLogs = () => {
 
       {/* Loading */}
       {loading && (
-        <div className="flex justify-center items-center min-h-[200px]">
-          <div className="animate-spin rounded-full h-10 w-10 border-4 border-green-500 border-t-transparent"></div>
+        <div className="flex justify-center items-center min-h-[240px]">
+          <div className="animate-spin rounded-full h-14 w-14 border-8 border-green-600 border-t-transparent shadow-lg"></div>
         </div>
       )}
 
       {/* Error */}
       {error && (
-        <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg shadow mb-4">
+        <div className="bg-red-200 border border-red-400 text-red-800 px-6 py-4 rounded-2xl shadow-lg mb-8 max-w-3xl mx-auto text-center font-semibold text-lg tracking-wide">
           {error}
         </div>
       )}
 
-      {/* Table */}
+      {/* Logs Grid */}
       {!loading && !error && (
-        <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-          <table className="min-w-full text-sm sm:text-base text-left">
-            <thead className="bg-gray-100 text-gray-700 uppercase text-xs font-semibold tracking-wider">
-              <tr>
-                <th className="px-4 py-3">Action</th>
-                <th className="px-4 py-3">User</th>
-                <th className="px-4 py-3">Timestamp</th>
-                <th className="px-4 py-3">Details</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
-              {filteredLogs.length > 0 ? (
-                filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50 transition">
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          log.action.toLowerCase().includes("upload")
-                            ? "bg-blue-100 text-blue-800"
-                            : log.action.toLowerCase().includes("login")
-                            ? "bg-green-100 text-green-800"
-                            : log.action.toLowerCase().includes("logout")
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {log.action}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {log.username || "N/A"}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-600">
-                      {log.timestamp
-                        ? new Date(log.timestamp).toLocaleString()
-                        : "N/A"}
-                    </td>
-                    <td className="px-4 py-3 break-words max-w-sm text-gray-800">
-                      {log.details}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="4"
-                    className="text-center text-gray-500 py-6 select-none"
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredLogs.length > 0 ? (
+            filteredLogs.map((log) => (
+              <div
+                key={log.id}
+                className="
+                  bg-white
+                  rounded-3xl
+                  border
+                  border-green-200
+                  shadow-xl
+                  p-6
+                  flex flex-col justify-between
+                  transform
+                  transition-transform duration-300
+                  hover:scale-[1.06] hover:shadow-2xl
+                  "
+              >
+                <div className="mb-4 flex flex-wrap items-center gap-3">
+                  <span
+                    className={`inline-block px-4 py-1.5 rounded-full font-semibold tracking-wide text-sm shadow-inner
+                      ${
+                        log.action.toLowerCase().includes("upload")
+                          ? "bg-blue-200 text-blue-900 shadow-blue-400"
+                          : log.action.toLowerCase().includes("login")
+                          ? "bg-green-200 text-green-900 shadow-green-400"
+                          : log.action.toLowerCase().includes("logout")
+                          ? "bg-yellow-200 text-yellow-900 shadow-yellow-400"
+                          : "bg-gray-200 text-gray-900 shadow-gray-400"
+                      }`}
                   >
-                    No activity logs found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    {log.action}
+                  </span>
+                </div>
+                <div className="text-base text-gray-800 font-semibold mb-1 truncate">
+                  User:{" "}
+                  <span className="font-normal">{log.username || "N/A"}</span>
+                </div>
+                <div className="text-sm text-gray-600 mb-3 font-mono">
+                  Timestamp:{" "}
+                  <span className="font-normal">
+                    {log.timestamp
+                      ? new Date(log.timestamp).toLocaleString()
+                      : "N/A"}
+                  </span>
+                </div>
+                <div className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap break-words max-h-28 overflow-auto scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100">
+                  <strong className="font-semibold">Details:</strong>{" "}
+                  {log.details}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 col-span-full py-20 text-xl font-semibold italic tracking-widest">
+              No activity logs found.
+            </p>
+          )}
         </div>
       )}
     </div>

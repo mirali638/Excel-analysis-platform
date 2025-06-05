@@ -57,7 +57,7 @@ exports.uploadChart = async (req, res) => {
 // Optional: Get all charts
 exports.getAllCharts = async (req, res) => {
   try {
-    const charts = await Chart.find().sort({ createdAt: -1 });
+    const charts = await Chart.find().sort({ createdAt: -1 }).limit(20);
     res.json(charts);
   } catch (error) {
     res.status(500).json({ message: "Error fetching charts" });

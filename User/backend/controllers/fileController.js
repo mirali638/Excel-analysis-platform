@@ -2,13 +2,11 @@ const File = require("../models/File");
 const XLSX = require("xlsx");
 const fs = require("fs");
 const logActivity = require("../utils/LogActivity");
-// Dummy function for processing file - replace with your actual logic
+
 async function processFile(filePath) {
   try {
-    // TODO: Add actual file processing logic here
-    // e.g. parse Excel, analyze data, etc.
-    // Return { success: true } or { success: false } accordingly
-    return { success: true }; // Simulate success
+    // Simulate processing (replace with your logic if needed)
+    return { success: true };
   } catch (error) {
     console.error("Error processing file:", error);
     return { success: false };
@@ -21,17 +19,33 @@ exports.uploadFile = async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
+    const filePath = req.file.path;
+    const fileBuffer = fs.readFileSync(filePath);
+
+    // Read Excel/CSV
+    const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+      defval: "", // default value for empty cells
+    });
+
+    const rowCount = jsonData.length;
+
     const newFile = new File({
       filename: req.file.filename,
       originalName: req.file.originalname,
-      filePath: req.file.path,
+      filePath: filePath,
       size: req.file.size,
       uploadedBy: req.user.id,
-      rowCount: 0, // Set initial row count to 0 or handle processing separately
+      rowCount: rowCount,
       status: "pending",
     });
 
     await newFile.save();
+
+    // Log user activity
     const user = req.user;
     await logActivity({
       userId: user.id,
@@ -40,10 +54,10 @@ exports.uploadFile = async (req, res) => {
       details: `Uploaded Excel file: ${req.file.originalname}`,
     });
 
-    // Process the file
-    // File processing logic can be added here asynchronously or in a separate worker
-    // For now, set status based on successful upload
-    newFile.status = "processed"; // Assuming upload is successful
+    // File Processing
+    const processResult = await processFile(filePath);
+
+    newFile.status = processResult.success ? "processed" : "error";
     await newFile.save();
 
     res.status(201).json({
@@ -63,9 +77,10 @@ exports.getMyUploads = async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const uploads = await File.find({ uploadedBy: userId }).sort({
-      uploadedAt: -1,
-    });
+    const uploads = await File.find({ uploadedBy: userId })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
     res.status(200).json({ uploads });
   } catch (err) {
     console.error("Fetch my uploads error:", err);

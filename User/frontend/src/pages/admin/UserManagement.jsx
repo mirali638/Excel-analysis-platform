@@ -6,7 +6,11 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", email: "", role: "user" });
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    role: "user",
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -15,12 +19,13 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:5000/api/admindashboard/users");
+      const response = await axios.get(
+        "http://localhost:5000/api/admindashboard/users"
+      );
       setUsers(response.data);
       setError(null);
     } catch (err) {
       setError("❌ Failed to fetch users.");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -42,7 +47,9 @@ const UserManagement = () => {
         `http://localhost:5000/api/admindashboard/users/${editingUser._id}`,
         editForm
       );
-      setUsers(users.map((u) => (u._id === editingUser._id ? response.data : u)));
+      setUsers(
+        users.map((u) => (u._id === editingUser._id ? response.data : u))
+      );
       setEditingUser(null);
     } catch (err) {
       setError("❌ Failed to update user.");
@@ -51,7 +58,9 @@ const UserManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/admindashboard/users/${id}`);
+      await axios.delete(
+        `http://localhost:5000/api/admindashboard/users/${id}`
+      );
       setUsers(users.filter((u) => u._id !== id));
     } catch (err) {
       setError("❌ Failed to delete user.");
@@ -84,96 +93,103 @@ const UserManagement = () => {
     }
   };
 
-  if (loading)
+  const UserCard = ({ user }) => {
+    const isBlocked = user.status === "blocked";
+
+    return (
+      <div
+        className={`rounded-2xl border border-gray-200 shadow-lg p-5 flex flex-col gap-4 max-w-full sm:max-w-[400px] break-words
+          transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-green-400
+          ${
+            isBlocked
+              ? "bg-red-100/80"
+              : "bg-gradient-to-br from-white to-gray-50"
+          }`}
+      >
+        <h3 className="text-lg font-semibold text-gray-800 break-words">
+          {user.name}
+        </h3>
+        <p className="text-gray-600 text-sm break-all">{user.email}</p>
+
+        <div className="flex justify-between items-center text-sm flex-wrap gap-2">
+          <span className="font-medium">
+            Status:{" "}
+            <span
+              className={`font-bold ${
+                isBlocked ? "text-red-600" : "text-green-600"
+              }`}
+            >
+              {user.status}
+            </span>
+          </span>
+          <select
+            value={user.role}
+            onChange={(e) => handleRoleChange(user._id, e.target.value)}
+            className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div className="flex flex-wrap gap-2 pt-2">
+          <button
+            onClick={() => handleEdit(user)}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1.5 rounded-lg shadow hover:shadow-md transition"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => handleDelete(user._id)}
+            className="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-1.5 rounded-lg shadow hover:shadow-md transition"
+          >
+            Delete
+          </button>
+          <button
+            onClick={() => handleBlockToggle(user._id)}
+            className={`text-white text-sm px-4 py-1.5 rounded-lg shadow hover:shadow-md transition ${
+              user.status === "active"
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-green-600 hover:bg-green-700"
+            }`}
+          >
+            {user.status === "active" ? "Block" : "Unblock"}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <div className="p-6 text-center text-red-500 font-semibold">{error}</div>
     );
+  }
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-screen-xl mx-auto">
-      <h2 className="text-3xl font-bold text-green-700 text-center mb-10">
+      <h2 className="text-4xl font-extrabold text-green-700 text-center mb-12 tracking-tight drop-shadow-sm">
         👥 User Management
       </h2>
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
-        <table className="min-w-full table-auto text-sm sm:text-base">
-          <thead className="bg-gray-100 text-gray-700">
-            <tr>
-              <th className="px-4 py-3 text-left">Name</th>
-              <th className="px-4 py-3 text-left">Email</th>
-              <th className="px-4 py-3 text-left">Role</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr
-                key={user._id}
-                className={`border-t ${user.status === "blocked" ? "bg-red-50" : ""}`}
-              >
-                <td className="px-4 py-3">{user.name}</td>
-                <td className="px-4 py-3">{user.email}</td>
-                <td className="px-4 py-3">
-                  <select
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                    className="border rounded px-2 py-1"
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </td>
-                <td className="px-4 py-3 font-semibold">
-                  <span
-                    className={`${
-                      user.status === "active" ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {user.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 flex flex-wrap gap-2">
-                  <button
-                    onClick={() => handleEdit(user)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user._id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => handleBlockToggle(user._id)}
-                    className={`${
-                      user.status === "active"
-                        ? "bg-yellow-500 hover:bg-yellow-600"
-                        : "bg-green-500 hover:bg-green-600"
-                    } text-white px-3 py-1 rounded`}
-                  >
-                    {user.status === "active" ? "Block" : "Unblock"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {users.map((user) => (
+          <UserCard key={user._id} user={user} />
+        ))}
       </div>
 
       {/* Edit Modal */}
       {editingUser && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md mx-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md mx-4 transition-all transform scale-100">
             <h3 className="text-xl font-bold mb-4">Edit User</h3>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
@@ -183,7 +199,7 @@ const UserManagement = () => {
                   name="name"
                   value={editForm.name}
                   onChange={handleEditChange}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
                   required
                 />
               </div>
@@ -194,7 +210,7 @@ const UserManagement = () => {
                   name="email"
                   value={editForm.email}
                   onChange={handleEditChange}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none transition"
                   required
                 />
               </div>
@@ -204,7 +220,7 @@ const UserManagement = () => {
                   name="role"
                   value={editForm.role}
                   onChange={handleEditChange}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -214,13 +230,13 @@ const UserManagement = () => {
                 <button
                   type="button"
                   onClick={() => setEditingUser(null)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
                   Save
                 </button>

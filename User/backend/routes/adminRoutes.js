@@ -142,7 +142,8 @@ router.get("/files/:id/download", async (req, res) => {
 
 router.get("/charts", async (req, res) => {
   try {
-    const charts = await Chart.find(); // or `await prisma.chart.findMany()` for Prisma
+    const charts = await Chart.find().sort({ createdAt: -1 });
+    // or `await prisma.chart.findMany()` for Prisma
     res.json(charts);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch charts" });

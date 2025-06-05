@@ -168,53 +168,56 @@ const ChartAnalytics = () => {
         </div>
       </div>
 
-      {/* Chart Table */}
-      <div className="overflow-x-auto bg-white rounded shadow">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-2 border text-left">Title</th>
-              <th className="px-4 py-2 border text-left">User</th>
-              <th className="px-4 py-2 border text-left">Type</th>
-              <th className="px-4 py-2 border text-left">Date</th>
-              <th className="px-4 py-2 border text-center">Export</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCharts.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center py-4 text-gray-500">
-                  No charts found.
-                </td>
-              </tr>
-            ) : (
-              filteredCharts.map((chart) => (
-                <tr key={chart._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border">{chart.title}</td>
-                  <td className="px-4 py-2 border">{chart.username}</td>
-                  <td className="px-4 py-2 border">{chart.chartType}</td>
-                  <td className="px-4 py-2 border">{chart.date}</td>
-                  <td className="px-4 py-2 border text-center">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                        onClick={() => exportAsPDF(chart._id, chart.title)}
-                      >
-                        PDF
-                      </button>
-                      <button
-                        className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
-                        onClick={() => exportAsImage(chart._id, chart.title)}
-                      >
-                        Image
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Chart Cards - Responsive Grid with Hover Effects */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredCharts.length === 0 ? (
+          <p className="text-center text-gray-500 col-span-full">
+            No charts found.
+          </p>
+        ) : (
+          filteredCharts.map((chart) => (
+            <div
+              key={chart._id}
+              className="rounded-2xl border border-gray-200 shadow-lg p-5 flex flex-col gap-4 max-w-full sm:max-w-[400px] break-words
+          transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-green-400"
+            >
+              <div className="mb-4">
+                <h3 className="text-2xl font-semibold text-blue-700 mb-3">
+                  {chart.title}
+                </h3>
+                <div className="flex flex-wrap gap-4 text-gray-700 text-sm">
+                  <p>
+                    <span className="font-semibold text-gray-900">User:</span>{" "}
+                    {chart.username}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-900">Type:</span>{" "}
+                    {chart.chartType}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-900">Date:</span>{" "}
+                    {chart.date}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-auto">
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 transition"
+                  onClick={() => exportAsPDF(chart._id, chart.title)}
+                >
+                  Export PDF
+                </button>
+                <button
+                  className="bg-green-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-green-700 transition"
+                  onClick={() => exportAsImage(chart._id, chart.title)}
+                >
+                  Export Image
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Hidden Export Elements */}
@@ -242,7 +245,11 @@ const ChartAnalytics = () => {
             </p>
             {/* Use the saved image directly for export */}
             {chart.image ? (
-              <img src={chart.image} alt={chart.title} style={{ width: '100%', height: 'auto' }} />
+              <img
+                src={chart.image}
+                alt={chart.title}
+                style={{ width: "100%", height: "auto" }}
+              />
             ) : (
               <p>Image not available for this chart.</p>
             )}

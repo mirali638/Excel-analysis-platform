@@ -139,14 +139,20 @@ router.get("/files/:id/download", async (req, res) => {
     res.status(500).json({ message: "Error downloading file" });
   }
 });
-
 router.get("/charts", async (req, res) => {
   try {
-    const charts = await Chart.find().sort({ createdAt: -1 });
-    // or `await prisma.chart.findMany()` for Prisma
+    console.log("📊 Fetching charts with allowDiskUse...");
+
+    const charts = await Chart.aggregate([
+      { $sort: { createdAt: -1 } },
+      { $limit: 50 },
+    ]).allowDiskUse(true); // ✅ Correct method in Mongoose
+
+    console.log("✅ Charts fetched:", charts.length);
     res.json(charts);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch charts" });
+    console.error("❌ Error in /charts route:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

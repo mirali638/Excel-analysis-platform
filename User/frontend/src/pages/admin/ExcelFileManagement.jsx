@@ -8,12 +8,7 @@ const ExcelFileManagement = () => {
 
   useEffect(() => {
     setLoading(true);
-    const token = localStorage.getItem('token');
-    fetch("http://localhost:5000/api/admindashboard/files", {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
+    fetch("http://localhost:5000/api/admindashboard/excel/files")
       .then((res) => res.json())
       .then((data) => {
         setFiles(data);
@@ -68,8 +63,8 @@ const ExcelFileManagement = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        const fileName = files.find((file) => file._id === id)?.originalName || "Unknown";
-        a.download = fileName;
+        a.download =
+          files.find((file) => file._id === id)?.originalName || "Unknown";
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -122,6 +117,7 @@ const ExcelFileManagement = () => {
                 className="rounded-2xl border border-gray-200 shadow-lg p-5 flex flex-col justify-between group max-w-full
                   transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-green-400"
               >
+                {/* File Details */}
                 <div className="mb-4 space-y-1 text-gray-700 leading-relaxed">
                   <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-green-700 transition">
                     {file.originalName}
@@ -131,6 +127,10 @@ const ExcelFileManagement = () => {
                     <span className="not-italic text-gray-700 font-medium">
                       {file.uploadedBy?.name || "Unknown"}
                     </span>
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    📦 Size:{" "}
+                    <span className="font-medium text-black">{file.size}</span>
                   </p>
                   <p className="text-sm text-gray-600">
                     🧭 Status:{" "}
@@ -146,10 +146,17 @@ const ExcelFileManagement = () => {
                       {file.status}
                     </span>
                   </p>
+                  <p className="text-sm text-gray-500">
+                    📅 Uploaded:{" "}
+                    <span className="text-gray-800 font-medium">
+                      {new Date(file.createdAt).toLocaleDateString()}
+                    </span>
+                  </p>
                 </div>
 
                 <hr className="border-t border-dashed border-gray-300 my-3" />
 
+                {/* Action Buttons */}
                 <div className="flex flex-col gap-2 text-sm">
                   <button
                     onClick={() => handleViewMetadata(file._id)}
@@ -176,6 +183,7 @@ const ExcelFileManagement = () => {
         </div>
       )}
 
+      {/* Modal for File Metadata */}
       {selectedFile && (
         <div
           className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"

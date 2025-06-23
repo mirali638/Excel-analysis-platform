@@ -18,6 +18,7 @@ import {
 } from "chart.js";
 import jsPDF from "jspdf";
 import { Toaster, toast } from "react-hot-toast";
+import Plot from "react-plotly.js";
 
 // Import chart utility functions
 import {

@@ -14,7 +14,7 @@ const SignUpForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/auth/signup", form);
+      await axios.post("https://excel-analysis-platform-s54m.onrender.com/api/auth/signup", form);
       alert("Signup successful. Please log in.");
       navigate("/login");
     } catch (err) {

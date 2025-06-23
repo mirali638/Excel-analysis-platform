@@ -8,7 +8,7 @@ const ExcelFileManagement = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:5000/api/admindashboard/excel/files")
+    fetch("https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/excel/files")
       .then((res) => res.json())
       .then((data) => {
         setFiles(data);
@@ -23,7 +23,7 @@ const ExcelFileManagement = () => {
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this file?")) {
       const token = localStorage.getItem('token');
-      fetch(`http://localhost:5000/api/admindashboard/files/${id}`, {
+      fetch(`https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/files/${id}`, {
         method: "DELETE",
         headers: {
           'Authorization': `Bearer ${token}`
@@ -46,7 +46,7 @@ const ExcelFileManagement = () => {
       return;
     }
 
-    fetch(`http://localhost:5000/api/admindashboard/files/${id}/download`, {
+    fetch(`https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/files/${id}/download`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -77,7 +77,7 @@ const ExcelFileManagement = () => {
 
   const handleViewMetadata = (id) => {
     const token = localStorage.getItem('token');
-    fetch(`http://localhost:5000/api/admindashboard/files/${id}`, {
+    fetch(`https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/files/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

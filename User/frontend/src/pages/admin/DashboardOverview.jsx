@@ -10,7 +10,7 @@ const DashboardOverview = () => {
     const fetchDashboardData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/admindashboard/dashboard",
+          "https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/dashboard",
           { withCredentials: true }
         );
         setData(response.data);

@@ -15,7 +15,7 @@ const History = () => {
       }
 
       const res = await axios.get(
-        "http://localhost:5000/api/files/my-uploads",
+        "https://excel-analysis-platform-s54m.onrender.com/api/files/my-uploads",
         {
           headers: {
             Authorization: `Bearer ${token}`,

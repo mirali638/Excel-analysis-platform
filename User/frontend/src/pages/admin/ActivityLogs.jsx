@@ -15,7 +15,7 @@ const ActivityLogs = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:5000/api/admindashboard/activity/logs"
+        "https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/activity/logs"
       );
       setLogs(response.data);
       setError(null);

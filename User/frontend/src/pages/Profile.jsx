@@ -24,7 +24,7 @@ const Profile = () => {
           return;
         }
 
-        const res = await axios.get("http://localhost:5000/api/profile", {
+        const res = await axios.get("https://excel-analysis-platform-s54m.onrender.com/api/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -60,7 +60,7 @@ const Profile = () => {
       };
 
       const res = await axios.put(
-        "http://localhost:5000/api/profile",
+        "https://excel-analysis-platform-s54m.onrender.com/api/profile",
         updated,
         {
           headers: { Authorization: `Bearer ${token}` },

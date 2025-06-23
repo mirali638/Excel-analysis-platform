@@ -20,7 +20,7 @@ const UserManagement = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:5000/api/admindashboard/users"
+        "https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/users"
       );
       setUsers(response.data);
       setError(null);
@@ -44,7 +44,7 @@ const UserManagement = () => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/admindashboard/users/${editingUser._id}`,
+        `https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/users/${editingUser._id}`,
         editForm
       );
       setUsers(
@@ -59,7 +59,7 @@ const UserManagement = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/admindashboard/users/${id}`
+        `https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/users/${id}`
       );
       setUsers(users.filter((u) => u._id !== id));
     } catch (err) {
@@ -72,7 +72,7 @@ const UserManagement = () => {
       const user = users.find((u) => u._id === id);
       const newStatus = user.status === "active" ? "blocked" : "active";
       const response = await axios.put(
-        `http://localhost:5000/api/admindashboard/users/${id}/status`,
+        `https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/users/${id}/status`,
         { status: newStatus }
       );
       setUsers(users.map((u) => (u._id === id ? response.data : u)));
@@ -84,7 +84,7 @@ const UserManagement = () => {
   const handleRoleChange = async (id, newRole) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/admindashboard/users/${id}`,
+        `https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/users/${id}`,
         { role: newRole }
       );
       setUsers(users.map((u) => (u._id === id ? response.data : u)));

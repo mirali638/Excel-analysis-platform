@@ -66,7 +66,7 @@ const ChartAnalytics = () => {
     const fetchCharts = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/admindashboard/excel/charts"
+          "https://excel-analysis-platform-s54m.onrender.com/api/admindashboard/excel/charts"
         );
         const data = res.data;
         setCharts(data);

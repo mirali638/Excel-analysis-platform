@@ -10,7 +10,7 @@ const Logout = () => {
         const token = localStorage.getItem("token");
 
         if (token) {
-          await fetch("http://localhost:5000/api/auth/logout", {
+          await fetch("https://excel-analysis-platform-s54m.onrender.com/api/auth/logout", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,

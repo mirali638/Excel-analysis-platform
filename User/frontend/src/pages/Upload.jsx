@@ -151,7 +151,7 @@ const Upload = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      await axios.post("http://localhost:5000/api/files/upload", formData, {
+      await axios.post("https://excel-analysis-platform-s54m.onrender.com/api/files/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -195,7 +195,7 @@ const Upload = () => {
           if (chartRef.current && chartRef.current.canvas) {
             const imageData = chartRef.current.canvas.toDataURL("image/png");
             await axios.post(
-              "http://localhost:5000/api/charts/upload",
+              "https://excel-analysis-platform-s54m.onrender.com/api/charts/upload",
               {
                 title: chartTitle,
                 username,
@@ -266,7 +266,7 @@ const Upload = () => {
           });
 
           await axios.post(
-            "http://localhost:5000/api/charts/upload",
+            "https://excel-analysis-platform-s54m.onrender.com/api/charts/upload",
             {
               title: chartTitle,
               username,

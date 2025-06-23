@@ -28,7 +28,7 @@ const Contact = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/contact",
+        "https://excel-analysis-platform-s54m.onrender.com/api/contact",
         formData
       );
       setStatus({ loading: false, success: res.data.message, error: null });

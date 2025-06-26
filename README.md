@@ -118,15 +118,4 @@ npm run dev
 
 ---
 
-## License
-This project is licensed under the ISC License.
-
----
-
-## Contact & Legal
-- For support or feedback, use the contact form in the app or email the maintainer.
-- By using this platform, you agree to the terms and privacy policy (see About page in the app).
-
----
-
 *Empowering everyone to turn Excel data into insights!*

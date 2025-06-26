@@ -7,7 +7,7 @@ Excel Analysis Platform is a full-stack web application that empowers users to e
 
 ## Features
 - **Upload & Process Excel/CSV Files**: Seamless upload and parsing of `.xls`, `.xlsx`, and `.csv` files.
-- **Dynamic Visualization**: Create 2D/3D charts (bar, line, pie, scatter, radar, plotly, etc.).
+- **Dynamic Visualization**: Create 2D/3D charts (bar, line, pie, scatter, radar, etc.).
 - **Interactive & Responsive UI**: Modern, mobile-friendly React interface.
 - **User Authentication**: Secure login, signup, and session management.
 - **Profile Management**: Update user details and manage account.

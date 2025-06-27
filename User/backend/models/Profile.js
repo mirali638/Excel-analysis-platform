@@ -28,7 +28,5 @@ const profileSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create Profile model based on the schema
 const Profile = mongoose.model("Profile", profileSchema);
-
 module.exports = Profile;

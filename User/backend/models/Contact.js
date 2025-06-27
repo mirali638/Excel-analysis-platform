@@ -19,12 +19,8 @@ const contactMessageSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-  },
-  {
-    timestamps: true, // Adds createdAt and updatedAt fields automatically
-  }
+  },{timestamps: true,} // Adds createdAt and updatedAt fields automatically
 );
 
 const Contact = mongoose.model("ContactMessage", contactMessageSchema);
-
 module.exports = Contact;

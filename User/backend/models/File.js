@@ -37,10 +37,7 @@ const fileSchema = new mongoose.Schema(
       enum: ['xlsx', 'xls', 'csv'],
       required: true
     }
-  },
-  { 
-    timestamps: true
-  }
+  }, {  timestamps: true  }
 );
 
 // Virtual for formatted size

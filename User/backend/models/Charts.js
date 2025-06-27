@@ -29,7 +29,7 @@ const chartSchema = new mongoose.Schema({
     required: true,
   },
   image: {
-    type: String, // assuming URL or base64
+    type: String, // URL or base64
     required: false,
   },
   createdBy: {
@@ -37,7 +37,7 @@ const chartSchema = new mongoose.Schema({
     required: true,
   },
   date: {
-    type: String, // optional formatted date string
+    type: String,
     default: () => new Date().toLocaleDateString(),
   },
   createdAt: {

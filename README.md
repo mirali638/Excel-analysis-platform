@@ -1,4 +1,4 @@
-# Excel Analysis Platform
+# Excel-analysis-platform
 
 ## Overview
 Excel Analysis Platform is a full-stack web application that empowers users to effortlessly upload, analyze, and visualize Excel data. It provides dynamic 2D/3D charting, interactive dashboards, and robust admin controls, making complex data approachable for analysts, business professionals, and enthusiasts.
@@ -7,7 +7,7 @@ Excel Analysis Platform is a full-stack web application that empowers users to e
 
 ## Features
 - **Upload & Process Excel/CSV Files**: Seamless upload and parsing of `.xls`, `.xlsx`, and `.csv` files.
-- **Dynamic Visualization**: Create 2D/3D charts (bar, line, pie, scatter, radar, plotly, etc.).
+- **Dynamic Visualization**: Create 2D/3D charts (bar, line, pie, scatter, radar, etc.).
 - **Interactive & Responsive UI**: Modern, mobile-friendly React interface.
 - **User Authentication**: Secure login, signup, and session management.
 - **Profile Management**: Update user details and manage account.
@@ -115,17 +115,6 @@ npm run dev
 2. Create a feature branch (`git checkout -b feature/your-feature`)
 3. Commit your changes & push.
 4. Open a Pull Request.
-
----
-
-## License
-This project is licensed under the ISC License.
-
----
-
-## Contact & Legal
-- For support or feedback, use the contact form in the app or email the maintainer.
-- By using this platform, you agree to the terms and privacy policy (see About page in the app).
 
 ---
 

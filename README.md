@@ -4,7 +4,7 @@
 Excel Analysis Platform is a full-stack web application that empowers users to effortlessly upload, analyze, and visualize Excel data. It provides dynamic 2D/3D charting, interactive dashboards, and robust admin controls, making complex data approachable for analysts, business professionals, and enthusiasts.
 
 ---
-
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=mirali638&repo=Excel-analysis-platform)](https://github.com/mirali638/Excel-analysis-platform)
 ## Features
 - **Upload & Process Excel/CSV Files**: Seamless upload and parsing of `.xls`, `.xlsx`, and `.csv` files.
 - **Dynamic Visualization**: Create 2D/3D charts (bar, line, pie, scatter, radar, etc.).

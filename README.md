@@ -119,3 +119,4 @@ npm run dev
 ---
 
 *Empowering everyone to turn Excel data into insights!*
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=mirali638&repo=Excel-analysis-platform)](https://github.com/mirali638/Excel-analysis-platform)
